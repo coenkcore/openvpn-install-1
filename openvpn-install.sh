@@ -2,7 +2,7 @@
 # shellcheck disable=SC1091,SC2164,SC2034,SC1072,SC1073,SC1009
 
 # Secure OpenVPN server installer for Debian, Ubuntu, CentOS, Amazon Linux 2, Fedora, Oracle Linux 8, Arch Linux, Rocky Linux and AlmaLinux.
-# https://github.com/angristan/openvpn-install
+# https://github.com/coenkcore/openvpn-install-1
 
 function isRoot() {
 	if [ "$EUID" -ne 0 ]; then
@@ -112,8 +112,8 @@ function installUnbound() {
 			apt-get install -y unbound
 
 			# Configuration
-			echo 'interface: 10.8.0.1
-access-control: 10.8.0.1/24 allow
+			echo 'interface: 10.200.90.1
+access-control: 10.200.90.1/24 allow
 hide-identity: yes
 hide-version: yes
 use-caps-for-id: yes
@@ -123,8 +123,8 @@ prefetch: yes' >>/etc/unbound/unbound.conf
 			yum install -y unbound
 
 			# Configuration
-			sed -i 's|# interface: 0.0.0.0$|interface: 10.8.0.1|' /etc/unbound/unbound.conf
-			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.8.0.1/24 allow|' /etc/unbound/unbound.conf
+			sed -i 's|# interface: 0.0.0.0$|interface: 10.200.90.1|' /etc/unbound/unbound.conf
+			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.200.90.1/24 allow|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-identity: no|hide-identity: yes|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-version: no|hide-version: yes|' /etc/unbound/unbound.conf
 			sed -i 's|use-caps-for-id: no|use-caps-for-id: yes|' /etc/unbound/unbound.conf
@@ -133,8 +133,8 @@ prefetch: yes' >>/etc/unbound/unbound.conf
 			dnf install -y unbound
 
 			# Configuration
-			sed -i 's|# interface: 0.0.0.0$|interface: 10.8.0.1|' /etc/unbound/unbound.conf
-			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.8.0.1/24 allow|' /etc/unbound/unbound.conf
+			sed -i 's|# interface: 0.0.0.0$|interface: 10.200.90.1|' /etc/unbound/unbound.conf
+			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.200.90.1/24 allow|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-identity: no|hide-identity: yes|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-version: no|hide-version: yes|' /etc/unbound/unbound.conf
 			sed -i 's|# use-caps-for-id: no|use-caps-for-id: yes|' /etc/unbound/unbound.conf
@@ -156,8 +156,8 @@ prefetch: yes' >>/etc/unbound/unbound.conf
 	directory: "/etc/unbound"
 	trust-anchor-file: trusted-key.key
 	root-hints: root.hints
-	interface: 10.8.0.1
-	access-control: 10.8.0.1/24 allow
+	interface: 10.200.90.1
+	access-control: 10.200.90.1/24 allow
 	port: 53
 	num-threads: 2
 	use-caps-for-id: yes
@@ -191,8 +191,8 @@ private-address: ::ffff:0:0/96" >>/etc/unbound/unbound.conf
 
 		# Add Unbound 'server' for the OpenVPN subnet
 		echo 'server:
-interface: 10.8.0.1
-access-control: 10.8.0.1/24 allow
+interface: 10.200.90.1
+access-control: 10.200.90.1/24 allow
 hide-identity: yes
 hide-version: yes
 use-caps-for-id: yes
@@ -218,7 +218,7 @@ access-control: fd42:42:42:42::/112 allow' >>/etc/unbound/openvpn.conf
 
 function installQuestions() {
 	echo "Welcome to the OpenVPN installer!"
-	echo "The git repository is available at: https://github.com/angristan/openvpn-install"
+	echo "The git repository is available at: https://github.com/coenkcore/openvpn-install-1"
 	echo ""
 
 	echo "I need to ask you a few questions before starting the setup."
@@ -238,7 +238,7 @@ function installQuestions() {
 	if [[ $APPROVE_IP =~ n ]]; then
 		read -rp "IP address: " -e -i "$IP" IP
 	fi
-	# If $IP is a private IP address, the server must be behind NAT
+	# If $IP is a private IP address, the server must be behind NAT
 	if echo "$IP" | grep -qE '^(10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|192\.168)'; then
 		echo ""
 		echo "It seems this server is behind NAT. What is its public IPv4 address or hostname?"
@@ -384,7 +384,7 @@ function installQuestions() {
 	echo "Do you want to customize encryption settings?"
 	echo "Unless you know what you're doing, you should stick with the default parameters provided by the script."
 	echo "Note that whatever you choose, all the choices presented in the script are safe. (Unlike OpenVPN's defaults)"
-	echo "See https://github.com/angristan/openvpn-install#security-and-encryption to learn more."
+	echo "See https://github.com/coenkcore/openvpn-install-1#security-and-encryption to learn more."
 	echo ""
 	until [[ $CUSTOMIZE_ENC =~ (y|n) ]]; do
 		read -rp "Customize encryption settings? [y/n]: " -e -i n CUSTOMIZE_ENC
@@ -724,9 +724,15 @@ function installOpenVPN() {
 		esac
 
 		# Generate a random, alphanumeric identifier of 16 characters for CN and one for server name
-		SERVER_CN="cn_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
+		#SERVER_CN="cn_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
+		#echo "$SERVER_CN" >SERVER_CN_GENERATED
+		#SERVER_NAME="server_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
+		#echo "$SERVER_NAME" >SERVER_NAME_GENERATED
+
+    # Generate a random, alphanumeric identifier of 16 characters for CN and one for server name
+		SERVER_CN="cn_mitraprimautama"
 		echo "$SERVER_CN" >SERVER_CN_GENERATED
-		SERVER_NAME="server_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
+		SERVER_NAME="vpn_mitraprimautama"
 		echo "$SERVER_NAME" >SERVER_NAME_GENERATED
 
 		# Create the PKI, set up the CA, the DH params and the server certificate
@@ -782,7 +788,7 @@ persist-key
 persist-tun
 keepalive 10 120
 topology subnet
-server 10.8.0.0 255.255.255.0
+server 10.200.90.0 255.255.255.0
 ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 
 	# DNS resolvers
@@ -804,7 +810,7 @@ ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 		done
 		;;
 	2) # Self-hosted DNS resolver (Unbound)
-		echo 'push "dhcp-option DNS 10.8.0.1"' >>/etc/openvpn/server.conf
+		echo 'push "dhcp-option DNS 10.200.90.1"' >>/etc/openvpn/server.conf
 		if [[ $IPV6_SUPPORT == 'y' ]]; then
 			echo 'push "dhcp-option DNS fd42:42:42:42::1"' >>/etc/openvpn/server.conf
 		fi
@@ -906,6 +912,14 @@ verb 3" >>/etc/openvpn/server.conf
 	# Create log dir
 	mkdir -p /var/log/openvpn
 
+  # Create vpn log command
+	touch /bin/vpn
+	echo "#!/bin/bash
+cat /var/log/openvpn/status.log" >>/bin/vpn
+
+	# Make command executable
+	chmod +x /bin/vpn
+
 	# Enable routing
 	echo 'net.ipv4.ip_forward=1' >/etc/sysctl.d/99-openvpn.conf
 	if [[ $IPV6_SUPPORT == 'y' ]]; then
@@ -963,12 +977,25 @@ verb 3" >>/etc/openvpn/server.conf
 	mkdir -p /etc/iptables
 
 	# Script to add rules
-	echo "#!/bin/sh
-iptables -t nat -I POSTROUTING 1 -s 10.8.0.0/24 -o $NIC -j MASQUERADE
-iptables -I INPUT 1 -i tun0 -j ACCEPT
-iptables -I FORWARD 1 -i $NIC -o tun0 -j ACCEPT
-iptables -I FORWARD 1 -i tun0 -o $NIC -j ACCEPT
-iptables -I INPUT 1 -i $NIC -p $PROTOCOL --dport $PORT -j ACCEPT" >/etc/iptables/add-openvpn-rules.sh
+#	echo "#!/bin/sh
+#iptables -t nat -I POSTROUTING 1 -s 10.200.90.0/24 -o $NIC -j MASQUERADE
+#iptables -I INPUT 1 -i tun0 -j ACCEPT
+#iptables -I FORWARD 1 -i $NIC -o tun0 -j ACCEPT
+#iptables -I FORWARD 1 -i tun0 -o $NIC -j ACCEPT
+#iptables -I INPUT 1 -i $NIC -p $PROTOCOL --dport $PORT -j ACCEPT" >/etc/iptables/add-openvpn-rules.sh
+
+# New Script to add rules
+echo "#!/bin/sh
+iptables -t nat -A POSTROUTING -j MASQUERADE
+iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+
+## NAT TO CLIENT
+#######################
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 10.200.90.10:80
+iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination 10.200.90.10:443
+iptables -t nat -A PREROUTING -p tcp --dport 3389 -j DNAT --to-destination 10.200.90.10:3389
+iptables -t nat -A PREROUTING -p tcp --dport 15432 -j DNAT --to-destination 10.200.90.10:5432
+iptables -t nat -A PREROUTING -p tcp --dport 221 -j DNAT --to-destination 10.200.90.10:22" >/etc/iptables/add-openvpn-rules.sh
 
 	if [[ $IPV6_SUPPORT == 'y' ]]; then
 		echo "ip6tables -t nat -I POSTROUTING 1 -s fd42:42:42:42::/112 -o $NIC -j MASQUERADE
@@ -979,12 +1006,25 @@ ip6tables -I INPUT 1 -i $NIC -p $PROTOCOL --dport $PORT -j ACCEPT" >>/etc/iptabl
 	fi
 
 	# Script to remove rules
-	echo "#!/bin/sh
-iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o $NIC -j MASQUERADE
-iptables -D INPUT -i tun0 -j ACCEPT
-iptables -D FORWARD -i $NIC -o tun0 -j ACCEPT
-iptables -D FORWARD -i tun0 -o $NIC -j ACCEPT
-iptables -D INPUT -i $NIC -p $PROTOCOL --dport $PORT -j ACCEPT" >/etc/iptables/rm-openvpn-rules.sh
+#	echo "#!/bin/sh
+#iptables -t nat -D POSTROUTING -s 10.200.90.0/24 -o $NIC -j MASQUERADE
+#iptables -D INPUT -i tun0 -j ACCEPT
+#iptables -D FORWARD -i $NIC -o tun0 -j ACCEPT
+#iptables -D FORWARD -i tun0 -o $NIC -j ACCEPT
+#iptables -D INPUT -i $NIC -p $PROTOCOL --dport $PORT -j ACCEPT" >/etc/iptables/rm-openvpn-rules.sh
+
+# New Script to remove rules
+echo "#!/bin/sh
+iptables -t nat -A POSTROUTING -j MASQUERADE
+iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+
+## NAT TO CLIENT
+#######################
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 10.200.90.10:80
+iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination 10.200.90.10:443
+iptables -t nat -A PREROUTING -p tcp --dport 3389 -j DNAT --to-destination 10.200.90.10:3389
+iptables -t nat -A PREROUTING -p tcp --dport 15432 -j DNAT --to-destination 10.200.90.10:5432
+iptables -t nat -A PREROUTING -p tcp --dport 221 -j DNAT --to-destination 10.200.90.10:22" >/etc/iptables/rm-openvpn-rules.sh
 
 	if [[ $IPV6_SUPPORT == 'y' ]]; then
 		echo "ip6tables -t nat -D POSTROUTING -s fd42:42:42:42::/112 -o $NIC -j MASQUERADE
@@ -1044,8 +1084,10 @@ cipher $CIPHER
 tls-client
 tls-version-min 1.2
 tls-cipher $CC_CIPHER
-ignore-unknown-option block-outside-dns
-setenv opt block-outside-dns # Prevent Windows 10 DNS leak
+#redirect-gateway def1
+--pull-filter ignore redirect-gateway
+# ignore-unknown-option block-outside-dns
+# setenv opt block-outside-dns # Prevent Windows 10 DNS leak
 verb 3" >>/etc/openvpn/client-template.txt
 
 	if [[ $COMPRESSION_ENABLED == "y" ]]; then
@@ -1304,7 +1346,7 @@ function removeOpenVPN() {
 
 function manageMenu() {
 	echo "Welcome to OpenVPN-install!"
-	echo "The git repository is available at: https://github.com/angristan/openvpn-install"
+	echo "The git repository is available at: https://github.com/coenkcore/openvpn-install-1"
 	echo ""
 	echo "It looks like OpenVPN is already installed."
 	echo ""
