@@ -1,12 +1,8 @@
 # openvpn-install
 
-
-![Test](https://github.com/coenkcore/openvpn-install-1/workflows/Test/badge.svg)
-![Lint](https://github.com/coenkcore/openvpn-install-1/workflows/Lint/badge.svg)
+![Test](https://github.com/angristan/openvpn-install/workflows/Test/badge.svg)
+![Lint](https://github.com/angristan/openvpn-install/workflows/Lint/badge.svg)
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/angristan)
-
-
-forked from https://github.com/angristan/openvpn-install
 
 OpenVPN installer for Debian, Ubuntu, Fedora, CentOS, Arch Linux, Oracle Linux, Rocky Linux and AlmaLinux.
 
@@ -19,7 +15,7 @@ You can also check out [wireguard-install](https://github.com/angristan/wireguar
 First, get the script and make it executable:
 
 ```bash
-curl -O https://raw.githubusercontent.com/coenkcore/openvpn-install-1/master/openvpn-install.sh
+curl -O https://raw.githubusercontent.com/angristan/openvpn-install/master/openvpn-install.sh
 chmod +x openvpn-install.sh
 ```
 
